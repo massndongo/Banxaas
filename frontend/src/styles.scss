@@ -1,0 +1,21 @@
+
+
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+    font-family: 'Sora';
+    src: url(assets/font/Sora-VariableFont_wght.ttf) format("opentype");
+  }
+
+  @layer base {
+    html {
+      font-family: Sora;
+    }
+  }
+// html, body { height: 100%; }
+// body { margin: 0; font-family: Celias, "Celias"; }
+
+

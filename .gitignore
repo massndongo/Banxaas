@@ -1,0 +1,11 @@
+env
+__pycache__
+.history
+.vscode
+.angular
+node_modules
+.idea
+data
+runtime
+backend
+gateway

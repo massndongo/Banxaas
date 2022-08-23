@@ -1,0 +1,69 @@
+version: "3.9"
+
+services:
+  database:
+    image: postgres
+    container_name: database
+    volumes:
+      - ./data/postgres/pgdata:/var/lib/postgresql/data/pgdata
+    ports:
+      - ${DATABASE_MAP_PORT}:${DATABASE_SERVER_PORT}
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+
+  backend:
+    build: ./backend
+    container_name: backend
+    command: python manage.py runserver ${BACKEND_HOST}:${BACKEND_SERVER_PORT}
+    volumes: 
+      - ./backend/:/backend/
+      - ./backend/requirements.txt:/backend/requirements.txt
+    ports: 
+      - ${BACKEND_MAP_PORT}:${BACKEND_SERVER_PORT}
+    depends_on:
+      - database
+  
+  redis:
+    image: redis
+    container_name: redis
+    command: redis-server
+    ports:
+      - 6379:6379
+    depends_on:
+      - backend
+
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    command: python manage.py runserver ${GATEWAY_HOST}:${GATEWAY_SERVER_PORT}
+    volumes: 
+      - ./gateway/:/gateway/
+      - ./backend/requirements.txt:/backend/requirements.txt
+    ports: 
+      - ${GATEWAY_MAP_PORT}:${GATEWAY_SERVER_PORT}
+    depends_on:
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: frontend
+    command: ng serve --host 0.0.0.0 --port 32145 --disable-host-check
+    volumes: 
+      - ./frontend:/frontend
+      - /frontend/node_modules
+      - /frontend/.angular
+    ports: 
+      - 4200:32145
+    depends_on:
+      - gateway
+
+volumes:
+  frontend:
+    driver: local
+  backend:
+    driver: local
+  gateway:
+    driver: local

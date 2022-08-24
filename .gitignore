@@ -9,3 +9,4 @@ data
 runtime
 backend
 gateway
+.env
